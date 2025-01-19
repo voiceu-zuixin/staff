@@ -225,10 +225,6 @@ Page({
     this.generateNewScore();
   },
 
-  prevScore: function () {
-    this.generateNewScore();
-  },
-
   playNote: function (event) {
     const touch = event.touches[0];
     const { canvas } = this.data;

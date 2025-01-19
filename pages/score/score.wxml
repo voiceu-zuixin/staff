@@ -7,7 +7,6 @@
   ></canvas>
   
   <view class="button-group">
-    <button class="nav-button" bindtap="prevScore">上一张</button>
     <button class="nav-button" bindtap="nextScore">下一张</button>
   </view>
 
