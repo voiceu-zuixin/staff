@@ -3,14 +3,18 @@ Page({
     currentNotes: [], // 当前显示的音符数组
     // 修改音符范围，主要分布在五线谱内
     notePositions: [
-      { note: 'E4', weight: 1 },  // 第一线
+      { note: 'C4', weight: 1 },  // 下加一线
+      { note: 'D4', weight: 1 },  // 下加一间
+      { note: 'E4', weight: 2 },  // 第一线
       { note: 'F4', weight: 2 },  // 第一间
       { note: 'G4', weight: 2 },  // 第二线
-      { note: 'A4', weight: 3 },  // 第二间
-      { note: 'B4', weight: 3 },  // 第三线
-      { note: 'C5', weight: 3 },  // 第三间
+      { note: 'A4', weight: 2 },  // 第二间
+      { note: 'B4', weight: 2 },  // 第三线
+      { note: 'C5', weight: 2 },  // 第三间
       { note: 'D5', weight: 2 },  // 第四线
-      { note: 'E5', weight: 1 }   // 第四间
+      { note: 'E5', weight: 2 },  // 第四间
+      { note: 'F5', weight: 1 },  // 第五线
+      { note: 'G5', weight: 1 }   // 上加一线
     ],
     ctx: null,
     canvas: null,
@@ -18,6 +22,8 @@ Page({
     canvasHeight: 0,
     // 更新对应的频率表
     frequencyMap: {
+      'C4': 261.63,  // 下加一线
+      'D4': 293.66,  // 下加一间
       'E4': 329.63,  // 第一线
       'F4': 349.23,  // 第一间
       'G4': 392.00,  // 第二线
@@ -25,7 +31,9 @@ Page({
       'B4': 493.88,  // 第三线
       'C5': 523.25,  // 第三间
       'D5': 587.33,  // 第四线
-      'E5': 659.25   // 第四间
+      'E5': 659.25,  // 第四间
+      'F5': 698.46,  // 第五线
+      'G5': 783.99   // 上加一线
     },
     audioContext: null,
     activeNoteIndex: -1,
@@ -130,6 +138,8 @@ Page({
 
     // 重新调整音符位置映射，使其与五线谱位置对应
     const notePositions = {
+      'C4': 5,     // 下加一线
+      'D4': 4.5,   // 下加一间
       'E4': 4,     // 第一线
       'F4': 3.5,   // 第一间
       'G4': 3,     // 第二线
@@ -137,7 +147,9 @@ Page({
       'B4': 2,     // 第三线
       'C5': 1.5,   // 第三间
       'D5': 1,     // 第四线
-      'E5': 0.5    // 第四间
+      'E5': 0.5,   // 第四间
+      'F5': 0,     // 第五线
+      'G5': -0.5   // 上加一线
     };
 
     // 使用五线谱基准位置计算音符Y坐标
@@ -150,8 +162,14 @@ Page({
     ctx.fill();
 
     // 为五线谱外的音符添加附加线
-    if (position === 'E4') {
-      // 为E4添加第一线
+    if (position === 'C4') {
+      // 只为下加一线的音符添加附加线
+      ctx.beginPath();
+      ctx.moveTo(x - lineSpacing, y);
+      ctx.lineTo(x + lineSpacing, y);
+      ctx.stroke();
+    } else if (position === 'G5') {
+      // 为上加一线的音符添加附加线
       ctx.beginPath();
       ctx.moveTo(x - lineSpacing, y);
       ctx.lineTo(x + lineSpacing, y);
