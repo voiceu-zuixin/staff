@@ -66,9 +66,9 @@ Page({
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
 
-        // 获取实际设备信息
-        const sysInfo = wx.getSystemInfoSync();
-        const dpr = sysInfo.pixelRatio;
+        // 获取窗口信息
+        const windowInfo = wx.getWindowInfo();
+        const dpr = windowInfo.pixelRatio;
 
         // 设置 canvas 的实际尺寸
         canvas.width = res[0].width * dpr;
@@ -91,8 +91,9 @@ Page({
 
   drawStaff() {
     const { ctx, canvas } = this.data;
-    const width = canvas.width / wx.getSystemInfoSync().pixelRatio;
-    const height = canvas.height / wx.getSystemInfoSync().pixelRatio;
+    const windowInfo = wx.getWindowInfo();
+    const width = canvas.width / windowInfo.pixelRatio;
+    const height = canvas.height / windowInfo.pixelRatio;
     const lineSpacing = height / 16;
 
     // 计算五线谱的基准位置（第一线的Y坐标）
@@ -212,7 +213,8 @@ Page({
 
       // 画音符
       const { canvas } = this.data;
-      const width = canvas.width / wx.getSystemInfoSync().pixelRatio;
+      const windowInfo = wx.getWindowInfo();
+      const width = canvas.width / windowInfo.pixelRatio;
       const noteSpacing = (width - 100) / 4;
 
       notes.forEach((note, index) => {
@@ -228,7 +230,8 @@ Page({
   playNote: function (event) {
     const touch = event.touches[0];
     const { canvas } = this.data;
-    const width = canvas.width / wx.getSystemInfoSync().pixelRatio;
+    const windowInfo = wx.getWindowInfo();
+    const width = canvas.width / windowInfo.pixelRatio;
     const noteSpacing = (width - 100) / 4;
 
     // 计算点击了哪个音符，修改计算逻辑使其更准确
