@@ -94,8 +94,9 @@ Page({
     const noteSpacing = (width - 100) / 4;
     this.data.currentNotes.forEach((note, index) => {
       const x = 80 + noteSpacing * index;
+      // 修改可点击区域的位置，使其以音符为中心
       ctx.fillStyle = this.data.activeNoteIndex === index ? 'rgba(200, 200, 255, 0.3)' : 'rgba(240, 240, 240, 0.2)';
-      ctx.fillRect(x - noteSpacing / 2, 0, noteSpacing, height);
+      ctx.fillRect(x - noteSpacing / 4, 0, noteSpacing / 2, height);
     });
 
     // 绘制五线谱
@@ -214,9 +215,9 @@ Page({
     const width = canvas.width / wx.getSystemInfoSync().pixelRatio;
     const noteSpacing = (width - 100) / 4;
 
-    // 计算点击了哪个音符
+    // 计算点击了哪个音符，修改计算逻辑使其更准确
     const clickX = touch.x;
-    const noteIndex = Math.floor((clickX - 80) / noteSpacing);
+    const noteIndex = Math.round((clickX - 80) / noteSpacing);
 
     if (noteIndex >= 0 && noteIndex < this.data.currentNotes.length) {
       const note = this.data.currentNotes[noteIndex];
