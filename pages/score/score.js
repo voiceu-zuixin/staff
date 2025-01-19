@@ -5,11 +5,34 @@ Page({
     ctx: null,
     canvas: null,
     canvasWidth: 0,
-    canvasHeight: 0
+    canvasHeight: 0,
+    // 音符对应的频率（Hz）
+    frequencyMap: {
+      'C4': 261.63,
+      'D4': 293.66,
+      'E4': 329.63,
+      'F4': 349.23,
+      'G4': 392.00,
+      'A4': 440.00,
+      'B4': 493.88,
+      'C5': 523.25
+    },
+    audioContext: null
   },
 
   onLoad: function () {
     this.initCanvas();
+    // 初始化 WebAudio 上下文
+    this.setData({
+      audioContext: wx.createWebAudioContext()
+    });
+  },
+
+  onUnload: function () {
+    // 页面卸载时销毁音频上下文
+    if (this.data.audioContext) {
+      this.data.audioContext.destroy();
+    }
   },
 
   async initCanvas() {
@@ -123,11 +146,47 @@ Page({
     this.generateNewScore();
   },
 
-  playNote: function () {
-    // 这里可以根据currentNotes中的音符播放对应的音频
-    wx.showToast({
-      title: '播放音符：' + this.data.currentNotes.join(','),
-      icon: 'none'
-    });
+  playNote: function (event) {
+    // 获取点击位置
+    const touch = event.touches[0];
+    const { canvas } = this.data;
+    const width = canvas.width / wx.getSystemInfoSync().pixelRatio;
+    const noteSpacing = (width - 100) / 4;
+
+    // 计算点击了哪个音符
+    const clickX = touch.x;
+    const noteIndex = Math.floor((clickX - 80) / noteSpacing);
+
+    if (noteIndex >= 0 && noteIndex < this.data.currentNotes.length) {
+      const note = this.data.currentNotes[noteIndex];
+
+      // 创建音频节点
+      const oscillator = this.data.audioContext.createOscillator();
+      const gainNode = this.data.audioContext.createGain();
+
+      // 连接节点
+      oscillator.connect(gainNode);
+      gainNode.connect(this.data.audioContext.destination);
+
+      // 设置音符频率
+      oscillator.frequency.value = this.data.frequencyMap[note];
+
+      // 设置音量渐变（让声音更自然）
+      const now = this.data.audioContext.currentTime;
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + 0.1);
+      gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+
+      // 开始播放并在0.5秒后停止
+      oscillator.start(now);
+      oscillator.stop(now + 0.5);
+
+      // 显示正在播放的音符
+      wx.showToast({
+        title: `播放音符：${note}`,
+        icon: 'none',
+        duration: 1000
+      });
+    }
   }
 }) 
