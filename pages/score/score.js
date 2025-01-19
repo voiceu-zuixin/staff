@@ -38,7 +38,9 @@ Page({
     audioContext: null,
     activeNoteIndex: -1,
     staffBaseY: 0,
-    lineSpacing: 0
+    lineSpacing: 0,
+    showToast: false,
+    toastText: ''
   },
 
   onLoad: function () {
@@ -274,12 +276,33 @@ Page({
       oscillator.start(now);
       oscillator.stop(now + 0.4);
 
-      // 显示正在播放的音符
-      wx.showToast({
-        title: `播放音符：${note}`,
-        icon: 'none',
-        duration: 800
+      // 使用自定义提示
+      const noteNames = {
+        'C4': '下加一线 Do',
+        'D4': '下加一间 Re',
+        'E4': '第一线 Mi',
+        'F4': '第一间 Fa',
+        'G4': '第二线 So',
+        'A4': '第二间 La',
+        'B4': '第三线 Si',
+        'C5': '第三间 Do',
+        'D5': '第四线 Re',
+        'E5': '第四间 Mi',
+        'F5': '第五线 Fa',
+        'G5': '上加一线 So'
+      };
+
+      this.setData({
+        toastText: noteNames[note],
+        showToast: true
       });
+
+      // 0.8秒后隐藏提示
+      setTimeout(() => {
+        this.setData({
+          showToast: false
+        });
+      }, 800);
 
       // 0.4秒后清除激活状态
       setTimeout(() => {
