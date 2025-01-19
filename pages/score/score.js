@@ -94,7 +94,7 @@ Page({
     const windowInfo = wx.getWindowInfo();
     const width = canvas.width / windowInfo.pixelRatio;
     const height = canvas.height / windowInfo.pixelRatio;
-    const lineSpacing = height / 16;
+    const lineSpacing = height / 8;
 
     // 计算五线谱的基准位置（第一线的Y坐标）
     const staffBaseY = height / 2 - lineSpacing * 2;
