@@ -270,8 +270,8 @@ Page({
       // 优化音量渐变，使声音更自然
       const now = this.data.audioContext.currentTime;
       gainNode.gain.setValueAtTime(0, now);
-      gainNode.gain.linearRampToValueAtTime(0.2, now + 0.02);
-      gainNode.gain.linearRampToValueAtTime(0.1, now + 0.3);
+      gainNode.gain.linearRampToValueAtTime(1, now + 0.02);
+      gainNode.gain.linearRampToValueAtTime(1, now + 0.3);
       gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
 
       // 开始播放并在0.4秒后停止
