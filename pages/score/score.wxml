@@ -1,0 +1,13 @@
+<view class="container">
+  <canvas 
+    type="2d" 
+    id="scoreCanvas" 
+    class="score-canvas"
+    bindtap="playNote"
+  ></canvas>
+  
+  <view class="button-group">
+    <button class="nav-button" bindtap="prevScore">上一张</button>
+    <button class="nav-button" bindtap="nextScore">下一张</button>
+  </view>
+</view> 
