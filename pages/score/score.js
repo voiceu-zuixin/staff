@@ -14,7 +14,8 @@ Page({
       { note: 'D5', weight: 2 },  // 第四线
       { note: 'E5', weight: 2 },  // 第四间
       { note: 'F5', weight: 1 },  // 第五线
-      { note: 'G5', weight: 1 }   // 上加一线
+      { note: 'G5', weight: 1 },   // 上加一间
+      { note: 'A5', weight: 1 }   // 上加一线
     ],
     ctx: null,
     canvas: null,
@@ -33,7 +34,8 @@ Page({
       'D5': 587.33,  // 第四线
       'E5': 659.25,  // 第四间
       'F5': 698.46,  // 第五线
-      'G5': 783.99   // 上加一线
+      'G5': 783.99,   // 上加一间
+      'A5': 880.00   // 上加一线
     },
     audioContext: null,
     activeNoteIndex: -1,
@@ -152,7 +154,8 @@ Page({
       'D5': 1,     // 第四线
       'E5': 0.5,   // 第四间
       'F5': 0,     // 第五线
-      'G5': -0.5   // 上加一线
+      'G5': -0.5,   // 上加一间
+      'A5': -1   // 上加一线
     };
 
     // 使用五线谱基准位置计算音符Y坐标
@@ -171,7 +174,7 @@ Page({
       ctx.moveTo(x - lineSpacing, y);
       ctx.lineTo(x + lineSpacing, y);
       ctx.stroke();
-    } else if (position === 'G5') {
+    } else if (position === 'A5') {
       // 为上加一线的音符添加附加线
       ctx.beginPath();
       ctx.moveTo(x - lineSpacing, y);
@@ -288,7 +291,8 @@ Page({
         'D5': '第四线 Re (2)',
         'E5': '第四间 Mi (3)',
         'F5': '第五线 Fa (4)',
-        'G5': '上加一线 So (5)'
+        'G5': '上加一间 So (5)',
+        'A5': '上加一线 La (6)'
       };
 
       this.setData({
