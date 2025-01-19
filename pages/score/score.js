@@ -102,7 +102,7 @@ Page({
     ctx.clearRect(0, 0, width, height);
 
     // 首先绘制可点击区域的背景
-    const noteSpacing = (width - 100) / 4;
+    const noteSpacing = (width - 100) / 8;  // 修改为8等分
     this.data.currentNotes.forEach((note, index) => {
       const x = 80 + noteSpacing * index;
       // 修改可点击区域的位置，使其以音符为中心
@@ -185,8 +185,8 @@ Page({
     // 计算权重总和
     const totalWeight = this.data.notePositions.reduce((sum, pos) => sum + pos.weight, 0);
 
-    // 生成4个随机音符
-    for (let i = 0; i < 4; i++) {
+    // 生成8个随机音符
+    for (let i = 0; i < 8; i++) {
       // 生成一个随机权重值
       let randomWeight = Math.random() * totalWeight;
       let selectedNote = null;
@@ -215,7 +215,7 @@ Page({
       const { canvas } = this.data;
       const windowInfo = wx.getWindowInfo();
       const width = canvas.width / windowInfo.pixelRatio;
-      const noteSpacing = (width - 100) / 4;
+      const noteSpacing = (width - 100) / 8;  // 修改为8等分
 
       notes.forEach((note, index) => {
         this.drawNote(80 + noteSpacing * index, note);
@@ -232,7 +232,7 @@ Page({
     const { canvas } = this.data;
     const windowInfo = wx.getWindowInfo();
     const width = canvas.width / windowInfo.pixelRatio;
-    const noteSpacing = (width - 100) / 4;
+    const noteSpacing = (width - 100) / 8;  // 修改为8等分
 
     // 计算点击了哪个音符，修改计算逻辑使其更准确
     const clickX = touch.x;
