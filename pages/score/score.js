@@ -2,23 +2,35 @@ Page({
   data: {
     currentNotes: [], // 当前显示的音符数组
     // 修改音符范围，主要分布在五线谱内
-    notePositions: ['F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
+    notePositions: [
+      { note: 'E4', weight: 1 },  // 第一线
+      { note: 'F4', weight: 2 },  // 第一间
+      { note: 'G4', weight: 2 },  // 第二线
+      { note: 'A4', weight: 3 },  // 第二间
+      { note: 'B4', weight: 3 },  // 第三线
+      { note: 'C5', weight: 3 },  // 第三间
+      { note: 'D5', weight: 2 },  // 第四线
+      { note: 'E5', weight: 1 }   // 第四间
+    ],
     ctx: null,
     canvas: null,
     canvasWidth: 0,
     canvasHeight: 0,
     // 更新对应的频率表
     frequencyMap: {
-      'F4': 349.23,  // 第一线
-      'G4': 392.00,  // 第一间
-      'A4': 440.00,  // 第二线
-      'B4': 493.88,  // 第二间
-      'C5': 523.25,  // 第三线
-      'D5': 587.33,  // 第三间
-      'E5': 659.25   // 第四线
+      'E4': 329.63,  // 第一线
+      'F4': 349.23,  // 第一间
+      'G4': 392.00,  // 第二线
+      'A4': 440.00,  // 第二间
+      'B4': 493.88,  // 第三线
+      'C5': 523.25,  // 第三间
+      'D5': 587.33,  // 第四线
+      'E5': 659.25   // 第四间
     },
     audioContext: null,
-    activeNoteIndex: -1
+    activeNoteIndex: -1,
+    staffBaseY: 0,
+    lineSpacing: 0
   },
 
   onLoad: function () {
@@ -73,6 +85,9 @@ Page({
     const height = canvas.height / wx.getSystemInfoSync().pixelRatio;
     const lineSpacing = height / 16;
 
+    // 计算五线谱的基准位置（第一线的Y坐标）
+    const staffBaseY = height / 2 - lineSpacing * 2;
+
     ctx.clearRect(0, 0, width, height);
 
     // 首先绘制可点击区域的背景
@@ -88,9 +103,9 @@ Page({
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 1;
 
-    // 调整五线谱整体位置，使其更居中
+    // 画五条线，从第一线开始
     for (let i = 0; i < 5; i++) {
-      const y = height / 2 - lineSpacing * 2 + i * lineSpacing;
+      const y = staffBaseY + i * lineSpacing;
       ctx.moveTo(30, y);
       ctx.lineTo(width - 30, y);
     }
@@ -98,28 +113,34 @@ Page({
     // 调整高音谱号位置
     ctx.font = `${lineSpacing * 4}px serif`;
     ctx.fillStyle = '#000';
-    ctx.fillText('𝄞', 10, height / 2 + lineSpacing);
+    ctx.fillText('𝄞', 10, staffBaseY + lineSpacing * 3);
 
     ctx.stroke();
+
+    // 保存基准位置到 data 中，供 drawNote 使用
+    this.setData({
+      staffBaseY: staffBaseY,
+      lineSpacing: lineSpacing
+    });
   },
 
   drawNote(x, position) {
-    const { ctx, canvas } = this.data;
-    const height = canvas.height / wx.getSystemInfoSync().pixelRatio;
-    const lineSpacing = height / 16;
+    const { ctx, canvas, staffBaseY, lineSpacing } = this.data;
 
-    // 重新调整音符位置映射，使其均匀分布在五线谱上
+    // 重新调整音符位置映射，使其与五线谱位置对应
     const notePositions = {
-      'F4': 7,    // 第一线
-      'G4': 6.5,  // 第一间
-      'A4': 6,    // 第二线
-      'B4': 5.5,  // 第二间
-      'C5': 5,    // 第三线
-      'D5': 4.5,  // 第三间
-      'E5': 4     // 第四线
+      'E4': 4,     // 第一线
+      'F4': 3.5,   // 第一间
+      'G4': 3,     // 第二线
+      'A4': 2.5,   // 第二间
+      'B4': 2,     // 第三线
+      'C5': 1.5,   // 第三间
+      'D5': 1,     // 第四线
+      'E5': 0.5    // 第四间
     };
 
-    const y = height / 2 - lineSpacing * 2 + notePositions[position] * lineSpacing;
+    // 使用五线谱基准位置计算音符Y坐标
+    const y = staffBaseY + notePositions[position] * lineSpacing;
 
     // 画音符（黑色实心椭圆）
     ctx.beginPath();
@@ -128,8 +149,8 @@ Page({
     ctx.fill();
 
     // 为五线谱外的音符添加附加线
-    if (position === 'F4') {
-      // 为F4添加下加一线
+    if (position === 'E4') {
+      // 为E4添加第一线
       ctx.beginPath();
       ctx.moveTo(x - lineSpacing, y);
       ctx.lineTo(x + lineSpacing, y);
@@ -139,12 +160,30 @@ Page({
 
   generateNewScore() {
     const notes = [];
+    // 计算权重总和
+    const totalWeight = this.data.notePositions.reduce((sum, pos) => sum + pos.weight, 0);
+
     // 生成4个随机音符
     for (let i = 0; i < 4; i++) {
-      const randomNote = this.data.notePositions[
-        Math.floor(Math.random() * this.data.notePositions.length)
-      ];
-      notes.push(randomNote);
+      // 生成一个随机权重值
+      let randomWeight = Math.random() * totalWeight;
+      let selectedNote = null;
+
+      // 根据权重选择音符
+      for (const position of this.data.notePositions) {
+        randomWeight -= position.weight;
+        if (randomWeight <= 0) {
+          selectedNote = position.note;
+          break;
+        }
+      }
+
+      // 如果没有选中（理论上不会发生），选择最后一个音符
+      if (!selectedNote) {
+        selectedNote = this.data.notePositions[this.data.notePositions.length - 1].note;
+      }
+
+      notes.push(selectedNote);
     }
 
     this.setData({ currentNotes: notes }, () => {
